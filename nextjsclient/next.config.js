@@ -11,6 +11,10 @@ module.exports = () => {
         source: "/upload/:path*",
         destination: "http://localhost:5000/upload/:path*",
       },
+      {
+        source: "/delete/:path*",
+        destination: "http://localhost:5000/delete/:path*",
+      },
     ];
   };
   return {
