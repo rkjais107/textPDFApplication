@@ -1,5 +1,6 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import os
+import PyPDF2
 
 app = Flask(__name__)
 
@@ -37,6 +38,29 @@ def delete_file():
             return str(e)
     else:
         return 'File path not provided'
+
+
+@app.route('/read', methods=['POST'])
+def read_pdf():
+    print(request.form.get('fileName'))
+    file_name = request.form.get('fileName')
+    print(file_name)
+    file_path = 'D:\\MERN Completed Projects\\react-flask\\uploads\\' + file_name
+    print(file_path)
+    if file_name and file_path:
+        pdf_reader = PyPDF2.PdfReader(file_path)
+        num_pages = len(pdf_reader.pages)
+
+        # Read the contents of each page and concatenate them into a single string
+        contents = ''
+        for i in range(num_pages):
+            page = pdf_reader.pages[i]
+            contents += page.extract_text()
+
+        # Return the contents as a JSON response
+        return jsonify({'contents': contents})
+    else:
+        return 'File not provided'
 
 
 if __name__ == "__main__":

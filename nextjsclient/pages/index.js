@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -9,6 +9,8 @@ export default function Home() {
   console.log(selectedFile);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isFileUploaded, setIsFileUploaded] = useState(false);
+  const [readFileData, setReadFileData] = useState(null);
+  const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -73,6 +75,7 @@ export default function Home() {
         toast.success("File deleted successfully");
       } catch (error) {
         console.error(error);
+        toast.success("Error deleting file");
         // Handle error
       }
     }
@@ -80,6 +83,31 @@ export default function Home() {
     setSelectedFile(null);
     setUploadProgress(0);
     setIsFileUploaded(false);
+    setReadFileData(null);
+    fileInputRef.current.value = ""; // Reset the file input value
+  };
+
+  // handle file delete
+  const handleFileRead = async () => {
+    if (selectedFile) {
+      const formData = new FormData();
+      formData.append("fileName", selectedFile.name);
+      // Delete file from backend
+      try {
+        const readResponse = await axios.post("/read", formData);
+        setReadFileData(readResponse);
+        console.log("File read successfully");
+        toast.success("File read successfully");
+      } catch (error) {
+        console.error(error);
+        toast.success("Error reading file");
+        // Handle error
+      }
+    }
+
+    // setSelectedFile(null);
+    setUploadProgress(0);
+    // setIsFileUploaded(false);
   };
 
   return (
@@ -103,7 +131,9 @@ export default function Home() {
             Select File
           </label>
           <input
+            disabled={selectedFile !== null && isFileUploaded}
             id="file-input"
+            ref={fileInputRef}
             type="file"
             className="hidden"
             onChange={handleFileChange}
@@ -145,9 +175,13 @@ export default function Home() {
               disabled={!isFileUploaded}
               hidden={!isFileUploaded}
               className="mt-4 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded"
+              onClick={handleFileRead}
             >
               Read PDF
             </button>
+          </div>
+          <div className="container mx-auto my-5">
+            {readFileData && <p>{readFileData.data.contents}</p>}
           </div>
         </div>
       </main>
