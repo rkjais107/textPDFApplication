@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 import os
 import PyPDF2
 
+uploads='F:\\ngnixServer\\textPDFApplication\\uploads\\'
+
 app = Flask(__name__)
 
 # Members API Route
@@ -18,7 +20,7 @@ def upload():
         return {"message": 'No file selected', "status_code": 400}
 
     file = request.files['file']
-    file.save('D:\\MERN Completed Projects\\react-flask\\uploads\\' + file.filename)
+    file.save(uploads + file.filename)
 
     return {"message": 'File uploaded successfully', "status_code": 201}
 
@@ -28,7 +30,7 @@ def delete_file():
     print(request.form.get('fileName'))
     file_name = request.form.get('fileName')
     print(file_name)
-    file_path = 'D:\\MERN Completed Projects\\react-flask\\uploads\\' + file_name
+    file_path = uploads + file_name
     print(file_path)
     if file_name and file_path:
         try:
@@ -45,7 +47,7 @@ def read_pdf():
     print(request.form.get('fileName'))
     file_name = request.form.get('fileName')
     print(file_name)
-    file_path = 'D:\\MERN Completed Projects\\react-flask\\uploads\\' + file_name
+    file_path = uploads + file_name
     print(file_path)
     if file_name and file_path:
         pdf_reader = PyPDF2.PdfReader(file_path)
@@ -64,6 +66,6 @@ def read_pdf():
 
 
 if __name__ == "__main__":
-    # app.run(debug=True)
-    from waitress import serve
-    serve(app, host="0.0.0.0", port=5000)
+    app.run(debug=True)
+    #from waitress import serve
+    #serve(app, host="0.0.0.0", port=5000)
